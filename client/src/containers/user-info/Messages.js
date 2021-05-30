@@ -177,7 +177,6 @@ const Messages = () => {
       <MyModal
         isOpenModal={isShowSearchModal}
         setCloseModal={setIsShowSearchModal}
-        title="User's info detail"
         size="4xl"
       ></MyModal>
 

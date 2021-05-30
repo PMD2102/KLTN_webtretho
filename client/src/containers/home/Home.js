@@ -155,23 +155,21 @@ function Home() {
           />
           <Text>{userSelected?.username}</Text>
           {isAuthenticated ? (
-            <Link
-              to={{
-                pathname:
-                  userSelected?._id === user._id
-                    ? `/${user.username}/ho-so`
-                    : '/tin-nhan',
-                search:
-                  userSelected?._id === user._id
-                    ? ''
-                    : `?user=${userSelected?._id}`,
-              }}
-            >
-              {userSelected?._id === user._id ? (
-                <Button colorScheme="blue">Thông tin cá nhân</Button>
+              userSelected?._id === user._id ? (
+                <Link to={{
+                  pathname: `/${user.username}/ho-so`,
+                  search:''
+                }}>
+                  <Button colorScheme="blue">Thông tin cá nhân</Button>
+                </ Link>
               ) : (
                 <HStack>
-                  <Button colorScheme="blue">Nhắn tin</Button>
+                  <Link to={{
+                    pathname: '/tin-nhan',
+                    search: `?user=${userSelected?._id}`
+                  }}>
+                    <Button colorScheme="blue">Nhắn tin</Button>
+                  </Link>
                   <Button
                     colorScheme="pink"
                     onClick={() =>
@@ -181,8 +179,7 @@ function Home() {
                     Báo cáo
                   </Button>
                 </HStack>
-              )}
-            </Link>
+              )
           ) : (
             <Button
               colorScheme="blue"
