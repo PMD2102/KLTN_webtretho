@@ -1,11 +1,21 @@
-import { Avatar, Box, Button, HStack, Text } from '@chakra-ui/react';
+import { Avatar, Box, Button, HStack, Icon, Input, Text, Tooltip } from '@chakra-ui/react';
 import ImageGrid from 'components/common/ImageGrid';
 import LoadingPage from 'components/common/LoadingPage';
 import MainLayout from 'components/common/MainLayout';
+import ToastNotify from 'components/common/ToastNotify';
+import { REPORT_TYPE } from 'constants/keys';
 import { GlobalContext } from 'context/GlobalContext';
+import path from 'path';
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { timeSince } from 'utils';
+import { BiLike } from 'react-icons/bi';
+import {
+  FaBookmark,
+  FaFacebookSquare, FaFlag, FaRegComment
+} from 'react-icons/fa';
+import { MdSend } from 'react-icons/md';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { FacebookButton } from 'react-social';
+import { removeAndAdd, timeSince } from 'utils';
 import convertToHTML from 'utils/convertToHTML';
 import http from 'utils/http';
 import imagePath from 'utils/imagePath';
@@ -13,10 +23,13 @@ import imagePath from 'utils/imagePath';
 const DetailPost = () => {
   const { postId } = useParams();
   const history = useHistory();
+  
 
   const { isAuthenticated, joinedCommunities, joinCommunity, quitCommunity } = useContext(GlobalContext);
 
-  const [post, setPosts] = useState();
+  const [posts, setPosts] = useState();
+  const [commentInput, setCommentInput] = useState('');
+  const location = useLocation();
 
   useEffect(() => {
     if (postId)
@@ -31,10 +44,77 @@ const DetailPost = () => {
       community => community.community?._id === id
     ) !== -1;
 
+  const handleLikeOrUnlike = postId => {
+    if (!isAuthenticated) alert('Please sign in');
+    http
+      .get(`/posts/${postId}/like-or-unlike`)
+      .then(res => {
+        const { isLike } = res.data;
+        if (typeof isLike !== 'undefined') {
+          let post;
+          const idx = posts.findIndex(e => {
+            if (e._id === postId) {
+              post = e;
+              return true;
+            }
+            return false;
+          });
+          if (post) {
+            if (!isLike) post.totalLike++;
+            else post.totalLike--;
+            setPosts(removeAndAdd(posts, post, idx));
+          }
+        }
+      })
+      .catch(err => console.error(err));
+  };
+
+  const handleCommentPost = postId => {
+    if (!isAuthenticated) alert('Please sign in');
+    if (!commentInput.trim()) return;
+    http
+      .post(`/posts/${postId}/comment`, { content: commentInput })
+      .then(res => {
+        ToastNotify({
+          title: 'Bình luận của bạn sẽ được admin duyệt',
+          status: 'success',
+        });
+        setCommentInput('');
+      })
+      .catch(err => console.error(err));
+  };
+
+  const handleReport = (type, reportId) =>
+    http
+      .post('/report', { type, reportId })
+      .then(res =>
+        ToastNotify({ title: 'Báo cáo thành công', status: 'success' })
+      )
+      .catch(err => {
+        console.error(err.response);
+        const errMessage = err.response?.data;
+        errMessage &&
+          ToastNotify({ title: errMessage.toString(), status: 'warning' });
+      });
+
+  const handleSavePost = postId =>
+    http
+      .post('/posts/saved', { postId })
+      .then(rủ =>
+        ToastNotify({ title: 'Lưu bài viết thành công', status: 'success' })
+      )
+      .catch(err => {
+        console.error(err.response);
+        const errMessage = err.response?.data;
+        errMessage &&
+          ToastNotify({ title: errMessage.toString(), status: 'warning' });
+      });
+  
+
   return (
     <MainLayout>
-      {post ? (
-        <Box bg="white" borderRadius="md">
+      {posts ? (
+        <Box key={posts._id} bg="white" borderRadius="md" p="0.5em" mb="1em">
           <HStack
             justify="space-between"
             p="0.5em 1em"
@@ -42,11 +122,11 @@ const DetailPost = () => {
           >
             <HStack>
               <Avatar
-                name={post.community?.name}
-                src={imagePath(post.community?.avatar)}
+                name={posts.community?.name}
+                src={imagePath(posts.community?.avatar)}
               />
               <Text fontSize="xl" fontWeight="bold">
-                {post.community?.name}
+                {posts.community?.name}
               </Text>
             </HStack>
             <Button
@@ -54,7 +134,7 @@ const DetailPost = () => {
               bg={
                 !isAuthenticated
                   ? 'blue.700'
-                  : isJoinedCommunity(post.community._id)
+                  : isJoinedCommunity(posts.community._id)
                   ? 'teal'
                   : 'blue.700'
               }
@@ -62,7 +142,7 @@ const DetailPost = () => {
               my="0.5em"
               _hover={{ bg: 'blue.600' }}
               onClick={() => {
-                const communityId = post.community._id;
+                const communityId = posts.community._id;
                 if (!isAuthenticated) history.push('/dang-nhap');
                 if (isJoinedCommunity(communityId)) quitCommunity(communityId);
                 else joinCommunity(communityId);
@@ -70,7 +150,7 @@ const DetailPost = () => {
             >
               {!isAuthenticated
                 ? 'Tham gia'
-                : isJoinedCommunity(post.community._id)
+                : isJoinedCommunity(posts.community._id)
                 ? 'Đã tham gia'
                 : 'Tham gia'}
             </Button>
@@ -78,29 +158,188 @@ const DetailPost = () => {
           <Box textAlign="left" p="0.5em 1em">
             <HStack>
               <Avatar
-                name={post.author?.username}
-                src={imagePath(post.author?.avatar)}
+                name={posts.author?.username}
+                src={imagePath(posts.author?.avatar)}
               />
 
               <Box textAlign="left">
-                <Text fontWeight="600" color="blue.700" cursor="pointer">
-                  {post.author?.username}
-                </Text>
-                <Text fontSize="xs">{timeSince(post.createdAt)}</Text>
+                <HStack fontSize="md">
+                  <Text fontWeight="600" color="blue.700" cursor="pointer">
+                    {posts.author?.username}
+                  </Text>
+                  {posts.author?.tag && (
+                    <Text
+                      fontWeight="bold"
+                      fontSize="lg"
+                      color="red.400"
+                      bg="gray.200"
+                      p="0.5em"
+                      borderRadius="md"
+                    >
+                      {posts.author.tag}
+                    </Text>
+                    )}
+                </HStack>
+                <Text fontSize="xs">{timeSince(posts.createdAt)}</Text>
               </Box>
             </HStack>
 
             <Text fontWeight="600" fontSize="xl" color="black" mt="0.5em">
-              {post.title}
+              {posts.title}
             </Text>
+           
             <Text
               fontSize="md"
-              className="three-line-text"
               my="1em"
-              className="three-line-text"
-              dangerouslySetInnerHTML={convertToHTML(post.content)}
+              dangerouslySetInnerHTML={convertToHTML(posts.content)}
             ></Text>
-            <ImageGrid images={post.images?.map(img => imagePath(img))} />
+            <ImageGrid images={posts.images?.map(img => imagePath(img))} />
+            <HStack
+              borderTop="1px solid"
+              borderBottom="1px solid"
+              borderColor="gray.200"
+              justify="space-between"
+            >
+              <HStack spacing="8">
+                <Tooltip label="Thích">
+                  <HStack>
+                    <Box p="0.5em" onClick={() => handleLikeOrUnlike(posts._id)}>
+                      <Icon
+                        w="2em"
+                        h="2em"
+                        cursor="pointer"
+                        _hover={{ color: 'blue.700' }}
+                        as={BiLike}
+                      />
+                    </Box>
+                    <Text>{posts.totalLike}</Text>
+                  </HStack>
+                </Tooltip>
+
+                <Tooltip label="Bình luận">
+                  <HStack>
+                    <Box p="0.5em">
+                      <Icon
+                        w="2em"
+                        h="2em"
+                        cursor="pointer"
+                        _hover={{ color: 'blue.700' }}
+                        as={FaRegComment}
+                      />
+                    </Box>
+                    <Text>{posts.totalComment}</Text>
+                  </HStack>
+                </Tooltip>
+
+                <Tooltip label="Lưu bài viết">
+                  <Box p="0.5em">
+                    <Icon
+                      w="2em"
+                      h="2em"
+                      cursor="pointer"
+                      _hover={{ color: 'blue.700' }}
+                      as={FaBookmark}
+                      onClick={() => handleSavePost(posts._id)}
+                    />
+                  </Box>
+                </Tooltip>
+                <Tooltip label="Báo cáo">
+                  <Box p="0.5em">
+                    <Icon
+                      w="2em"
+                      h="2em"
+                      cursor="pointer"
+                      _hover={{ color: 'blue.700' }}
+                      as={FaFlag}
+                      onClick={() => handleReport(REPORT_TYPE.POST, posts._id)}
+                    />
+                  </Box>
+                </Tooltip>
+              </HStack>
+
+              <Box p="0.5em">
+                <FacebookButton
+                  url={path.join('http://localhost:3000', location.pathname)}
+                  appId="577516223211359"
+                >
+                  <Icon
+                    w="2em"
+                    h="2em"
+                    cursor="pointer"
+                    _hover={{ color: 'blue.700' }}
+                    as={FaFacebookSquare}
+                  />
+                </FacebookButton>
+              </Box>
+            </HStack>
+            {/* comments */}
+            {!!posts.comments?.length &&
+              posts.comments.map(comment => (
+                <HStack key={comment._id} align="flex-start" my="0.5em">
+                  <Avatar size="sm" name="User 1" src="" />
+                  <Box
+                    flex="1"
+                    p="0.5em 4em 0.5em 0.5em"
+                    borderRadius="md"
+                    bg="gray.100"
+                    pos="relative"
+                    className="comment"
+                  >
+                    <Text fontWeight="600">{comment.author?.username}</Text>
+                    <Text>{comment.content}</Text>
+
+                    <Box
+                      d="none"
+                      p="0.5em"
+                      pos="absolute"
+                      right="0"
+                      top="50%"
+                      transform="translateY(-50%)"
+                      className="report-comment"
+                    >
+                      <Icon
+                        w="2em"
+                        h="2em"
+                        cursor="pointer"
+                        _hover={{ color: 'blue.700' }}
+                        as={FaFlag}
+                        onClick={() =>
+                          handleReport(REPORT_TYPE.COMMENT, comment._id)
+                        }
+                      />
+                    </Box>
+                  </Box>
+                </HStack>
+              ))}
+            {/* input comment */}
+            <HStack my="0.5em">
+              <Avatar size="sm" name="User 1" src="" />
+              <Box flex="1" pos="relative">
+                <Input
+                  w="100%"
+                  pr="2.5em"
+                  borderRadius="3em"
+                  placeholder="Viết bình luận..."
+                  value={commentInput}
+                  onChange={e => setCommentInput(e.target.value)}
+                />
+                <Icon
+                  w="1.5em"
+                  h="1.5em"
+                  as={MdSend}
+                  cursor="pointer"
+                  _hover={{
+                    color: 'teal',
+                  }}
+                  pos="absolute"
+                  right="0.75em"
+                  top="50%"
+                  transform="translateY(-50%)"
+                  zIndex="1"
+                  onClick={() => handleCommentPost(posts._id)}
+                />
+              </Box>
+            </HStack>
           </Box>
         </Box>
       ) : (

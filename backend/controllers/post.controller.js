@@ -41,7 +41,7 @@ const createPost = async (req, res) => {
 const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("author", ["_id", "name", "username", "avatar"])
+      .populate("author", ["_id", "name", "username", "avatar", "tag"])
       .populate("community", ["_id", "name", "avatar"]);
     res.json(posts);
   } catch (error) {
@@ -116,7 +116,7 @@ const getPost = async (req, res) => {
 
     const _posts = await Post.populate(posts, {
       path: "author",
-      select: ["_id", "name", "username", "avatar"],
+      select: ["_id", "name", "username", "avatar", "tag"],
     });
     const __posts = await Post.populate(_posts, {
       path: "community",

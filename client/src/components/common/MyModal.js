@@ -14,6 +14,7 @@ const MyModal = ({
   title,
   isCloseIcon = false,
   closeOnOverlayClick = true,
+  scrollBehavior,
   size = 'md',
   children,
   isCentered = true,
@@ -25,6 +26,7 @@ const MyModal = ({
       isCentered={isCentered}
       closeOnOverlayClick={closeOnOverlayClick}
       size={size}
+      scrollBehavior={scrollBehavior}
     >
       <ModalOverlay />
       <ModalContent>

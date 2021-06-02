@@ -20,7 +20,6 @@ import imagePath from 'utils/imagePath';
 
 const UserInfoMenu = () => {
   const { user } = useContext(GlobalContext);
-
   const [isShowChangePasswordModal, setIsShowChangePasswordModal] =
     useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -91,8 +90,18 @@ const UserInfoMenu = () => {
       <VStack align="center">
         <Avatar size="2xl" name={user.username} src={imagePath(user.avatar)} />
         <Text>{user.username}</Text>
-        {/* <Text>Hóng</Text> */}
-        {/* <Text>0 Bài viết</Text> */}
+        {user?.tag && (
+          <Text
+            fontWeight="bold"
+            fontSize="lg"
+            color="red.400"
+            bg="gray.200"
+            p="0.5em"
+            borderRadius="md"
+          >
+            {user.tag}
+          </Text>
+        )}
       </VStack>
 
       <Divider my="1em" />

@@ -304,6 +304,7 @@ const Layout = ({ children, location }) => {
                         src={imagePath(user.avatar)}
                       />
                       <Text>{user.username}</Text>
+                    
                       <Icon ml="0" as={MdArrowDropDown} w={8} h={8} />
                       {isShowMenu && (
                         <Box

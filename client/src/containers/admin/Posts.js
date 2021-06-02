@@ -36,6 +36,7 @@ const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [isShowViewDetailModal, setIsShowDetailModal] = useState(false);
   const [postSelected, setPostSelected] = useState();
+  const [viewFull, setViewFull] = useState(false);
 
   useEffect(() => {
     http
@@ -75,7 +76,7 @@ const Posts = () => {
       <MyModal
         isOpenModal={isShowViewDetailModal}
         setCloseModal={setIsShowDetailModal}
-        title="User's info detail"
+        scrollBehavior="inside"
         size="4xl"
       >
         {/* header */}
@@ -114,10 +115,16 @@ const Posts = () => {
               </Text>
               <Text
                 fontSize="md"
-                className="three-line-text"
+                className={viewFull ? '': "three-line-text"}
                 my="1em"
                 dangerouslySetInnerHTML={convertToHTML(postSelected?.content)}
               ></Text>
+              <Text 
+                color="blue"
+                onClick={() => setViewFull(!viewFull)}
+              >
+                Xem thêm
+              </Text>
               <ImageGrid
                 images={postSelected?.images?.map(img => imagePath(img))}
               />
@@ -217,7 +224,7 @@ const Posts = () => {
                       setIsShowDetailModal(true);
                     }}
                   >
-                    View
+                    Xem
                   </Button>
                 </Td>
                 <Td color="white" isNumeric>
@@ -231,7 +238,7 @@ const Posts = () => {
                             handleApproveOrRejectPost(post._id, true)
                           }
                         >
-                          Approve
+                          Duyệt
                         </Button>
                       )}
                       {post.status !== menu.reject && (
@@ -242,7 +249,7 @@ const Posts = () => {
                             handleApproveOrRejectPost(post._id, false)
                           }
                         >
-                          Reject
+                          Từ chối
                         </Button>
                       )}
                     </>
@@ -251,7 +258,7 @@ const Posts = () => {
                       _hover={{ bg: 'red.200' }}
                       onClick={() => handleDeletePost(post._id)}
                     >
-                      Delete
+                      Xóa
                     </Button>
                   </HStack>
                 </Td>

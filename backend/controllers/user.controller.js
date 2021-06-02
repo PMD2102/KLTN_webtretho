@@ -84,6 +84,7 @@ const signIn = async (req, res) => {
       name: user.name,
       username: user.username,
       avatar: user.avatar,
+      tag: user.tag,
       role: user.role,
     };
     const token = await jwt.sign(payload, keys.SECRET_KEY_JWT, {
@@ -117,6 +118,7 @@ const facebookSignIn = async (req, res) => {
         name: user.name,
         username: user.username,
         avatar: user.avatar,
+        tag: user.tag,
         role: user.role,
       };
       const token = await jwt.sign(payload, keys.SECRET_KEY_JWT, {

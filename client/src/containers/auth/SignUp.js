@@ -17,6 +17,7 @@ import http from 'utils/http';
 import jwtDecode from 'jwt-decode';
 import ToastNotify from 'components/common/ToastNotify';
 import { GlobalContext } from 'context/GlobalContext';
+import FacebookSignIn from './FacebookSignIn';
 
 const SignUp = () => {
   const { setCurrentUser } = useContext(GlobalContext);
@@ -62,9 +63,6 @@ const SignUp = () => {
     <Box bg="white" w="30em" p="1em" textAlign="left" borderRadius="md">
       <Text fontSize="2xl" fontWeight="800">
         Đăng ký
-      </Text>
-      <Text fontSize="md">
-        Tham gia chia sẻ cùng cộng đồng phụ nữ lớn nhất Việt Nam
       </Text>
       <form onSubmit={handleSubmit(handleSignUp)}>
         <Box pos="relative" pb="0.5em">
@@ -167,18 +165,11 @@ const SignUp = () => {
             </Text>
           )}
         </Box>
-        <Checkbox defaultIsChecked>
-          <Text fontSize="md">
-            Tôi đồng ý với Thoả Thuận Về Điều Khoản và Điều Kiện Sử Dụng
-          </Text>
-        </Checkbox>
-        <Checkbox defaultIsChecked>
-          <Text fontSize="md">Tôi đồng ý với Chính Sách Bảo Mật</Text>
-        </Checkbox>
+
         <Text fontSize="md">
           Bằng việc bấm vào "ĐĂNG KÝ", bạn đồng ý rằng bạn đã đọc, hiểu và đồng
           ý với các điều khoản và điều kiện được quy định tại Thoả Thuận Về Điều
-          Khoản và Điều Kiện Sử Dụng vàChính Sách Bảo Mậtcủa chúng tôi.
+          Khoản và Điều Kiện Sử Dụng và Chính Sách Bảo Mật của chúng tôi.
         </Text>
 
         <Button
@@ -200,16 +191,7 @@ const SignUp = () => {
       <Divider my="0.5em" />
 
       <Text fontSize="md">Hoặc đăng nhập qua</Text>
-      <Button
-        bg="blue.700"
-        color="white"
-        my="0.5em"
-        w="100%"
-        _hover={{ bg: 'blue.600' }}
-      >
-        <Icon as={FaFacebookF} w="1.5em" h="1.5em" />
-        <Text>Facebook</Text>
-      </Button>
+      <FacebookSignIn />
 
       <HStack fontSize="md">
         <Text>Bạn đã có tài khoản Webtretho?</Text>

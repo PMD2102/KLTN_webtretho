@@ -7,21 +7,21 @@ import {
   Image,
   Input,
   Text,
-  VStack,
+  VStack
 } from '@chakra-ui/react';
+import MyModal from 'components/common/MyModal';
 import { GlobalContext } from 'context/GlobalContext';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
-import { FiFile, FiImage, FiInfo, FiUpload } from 'react-icons/fi';
+import { FiImage, FiInfo } from 'react-icons/fi';
 import { MdClose, MdSend } from 'react-icons/md';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { searchQueryToObj, timeSince } from 'utils';
 import http from 'utils/http';
-
 import imagePath from 'utils/imagePath';
-import MyModal from 'components/common/MyModal';
 import setTabName from 'utils/setTabName';
 import uploadFile from 'utils/uploadFile';
+
 
 const Messages = () => {
   const { search } = useLocation();

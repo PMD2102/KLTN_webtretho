@@ -2,20 +2,17 @@ import {
   Box,
   Button,
   Divider,
-  HStack,
-  Icon,
-  Input,
-  Text,
+  HStack, Input,
+  Text
 } from '@chakra-ui/react';
-import React, { useContext, useEffect } from 'react';
-import { FaFacebookF } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import setTabName from 'utils/setTabName';
-import { useForm } from 'react-hook-form';
-import http from 'utils/http';
-import jwtDecode from 'jwt-decode';
-import { GlobalContext } from 'context/GlobalContext';
 import ToastNotify from 'components/common/ToastNotify';
+import { GlobalContext } from 'context/GlobalContext';
+import jwtDecode from 'jwt-decode';
+import React, { useContext, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import http from 'utils/http';
+import setTabName from 'utils/setTabName';
 import FacebookSignIn from './FacebookSignIn';
 
 const SignIn = () => {
@@ -35,11 +32,12 @@ const SignIn = () => {
           const { token } = res.data;
           localStorage.setItem('token', token);
           const decoded = jwtDecode(token);
+          console.log(decoded);;
           setCurrentUser(decoded);
         })
         .catch(err => {
           console.log(err);
-          let errMessage = err.response?.data;
+          const errMessage = err.response?.data;
           if (errMessage) {
             ToastNotify({
               title: errMessage.toString(),
@@ -58,9 +56,6 @@ const SignIn = () => {
     <Box bg="white" w="30em" p="1em" textAlign="left" borderRadius="md">
       <Text fontSize="2xl" fontWeight="800">
         Đăng nhập
-      </Text>
-      <Text fontSize="md">
-        Tham gia chia sẻ cùng cộng đồng phụ nữ lớn nhất Việt Nam
       </Text>
 
       <form onSubmit={handleSubmit(handleSignIn)}>
@@ -81,9 +76,9 @@ const SignIn = () => {
               color="red.600"
             >
               {errors.username?.type === 'required'
-                ? 'Username is required'
+                ? 'Tên đăng nhập  là bắt buộc'
                 : errors.username?.type === 'maxLength'
-                ? 'Username is must less than 18 characters'
+                ? 'Tên đăng nhập nhỏ hơn 20 ký tự'
                 : ''}
             </Text>
           )}
@@ -106,9 +101,9 @@ const SignIn = () => {
               color="red.600"
             >
               {errors.password?.type === 'required'
-                ? 'password is required'
+                ? 'Mật khẩu là bắt buộc'
                 : errors.password?.type === 'maxLength'
-                ? 'password is must less than 20 characters'
+                ? 'Mật khẩu  nhỏ hơn 20 ký tự'
                 : ''}
             </Text>
           )}
@@ -124,10 +119,6 @@ const SignIn = () => {
           Đăng nhập
         </Button>
       </form>
-
-      <Text fontSize="md" color="blue.800" fontWeight="800">
-        Quên mật khẩu?
-      </Text>
       <Divider my="0.5em" />
       <Text fontSize="md">Hoặc đăng nhập qua</Text>
       <FacebookSignIn />
