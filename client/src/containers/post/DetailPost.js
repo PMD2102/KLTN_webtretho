@@ -25,7 +25,7 @@ const DetailPost = () => {
   const history = useHistory();
   
 
-  const { isAuthenticated, joinedCommunities, joinCommunity, quitCommunity } = useContext(GlobalContext);
+  const { isAuthenticated, joinedCommunities, joinCommunity, quitCommunity, user } = useContext(GlobalContext);
 
   const [posts, setPosts] = useState();
   const [commentInput, setCommentInput] = useState('');
@@ -276,7 +276,7 @@ const DetailPost = () => {
             {!!posts.comments?.length &&
               posts.comments.map(comment => (
                 <HStack key={comment._id} align="flex-start" my="0.5em">
-                  <Avatar size="sm" name="User 1" src="" />
+                  <Avatar size="sm" name={comment.author.username} src={comment.author.avatar} />
                   <Box
                     flex="1"
                     p="0.5em 4em 0.5em 0.5em"
@@ -313,7 +313,7 @@ const DetailPost = () => {
               ))}
             {/* input comment */}
             <HStack my="0.5em">
-              <Avatar size="sm" name="User 1" src="" />
+              <Avatar size="sm" name={user.username} src={user.avatar} />
               <Box flex="1" pos="relative">
                 <Input
                   w="100%"

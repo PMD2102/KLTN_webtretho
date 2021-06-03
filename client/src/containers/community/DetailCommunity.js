@@ -412,7 +412,7 @@ const DetailCommunity = () => {
                   {!!post.comments?.length &&
                     post.comments.map(comment => (
                       <HStack key={comment._id} align="flex-start" my="0.5em">
-                        <Avatar size="sm" name="User 1" src="" />
+                        <Avatar size="sm" name={comment.author.username} src={comment.author.avatar} />
                         <Box
                           flex="1"
                           p="0.5em 4em 0.5em 0.5em"
@@ -451,7 +451,7 @@ const DetailCommunity = () => {
                     ))}
                   {/* input comment */}
                   <HStack my="0.5em">
-                    <Avatar size="sm" name="User 1" src="" />
+                    <Avatar size="sm" name={user.username} src={user.avatar} />
                     <Box flex="1" pos="relative">
                       <Input
                         w="100%"

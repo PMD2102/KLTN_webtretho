@@ -39,6 +39,7 @@ const Search = () => {
   useEffect(() => {
     if (search) {
       const { search: _search } = queryString.parse(search);
+      console.log({search});
       if (_search) {
         setSearchText(_search);
         setLoading(true);
@@ -325,7 +326,7 @@ const Search = () => {
         </Box>
       </Box>
 
-      {/* right side */}
+      {/* right side
       <Box w="30%" bg="white" borderRadius="md" minH="5em" p="1em">
         <HStack
           justify="space-between"
@@ -336,7 +337,7 @@ const Search = () => {
           <Text as="b">Lịch sử tìm kiếm</Text>
           <Text color="gray.400">Xoá tất cả</Text>
         </HStack>
-      </Box>
+      </Box> */}
     </HStack>
   );
 };

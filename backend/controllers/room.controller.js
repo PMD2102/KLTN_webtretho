@@ -70,7 +70,11 @@ const getPrivateRoom = async (req, res) => {
       type: ROOM_TYPE.PRIVATE,
     });
     await newRoom.save();
-    const _newRoom = await Room.findById(newRoom._id);
+    const _newRoom = await Room.findById(newRoom._id).populate("members", [
+      "_id",
+      "username",
+      "avatar",
+    ]);
     res.json(_newRoom);
   } catch (error) {
     console.log(error);

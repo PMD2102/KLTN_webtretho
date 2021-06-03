@@ -5,21 +5,19 @@ import {
   Divider,
   HStack,
   Input,
-  Table,
-  TableCaption,
-  Tbody,
+  Table, Tbody,
   Td,
   Text,
-  Textarea,
-  Tfoot,
-  Th,
+  Textarea, Th,
   Thead,
-  Tr,
+  Tr
 } from '@chakra-ui/react';
 import LoadingPage from 'components/common/LoadingPage';
 import MyModal from 'components/common/MyModal';
+import ToastNotify from 'components/common/ToastNotify';
 import { GlobalContext } from 'context/GlobalContext';
 import React, { useContext, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import http from 'utils/http';
 import imagePath from 'utils/imagePath';
 import uploadFile from 'utils/uploadFile';
@@ -30,9 +28,12 @@ const Community = () => {
   const [isShowModal, setIsShowModal] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
   const [fileSelected, setFileSelected] = useState();
-  const [introduce, setIntroduce] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const handleUploadImage = () => {
     uploadFile(fileSelected)
@@ -40,30 +41,38 @@ const Community = () => {
       .catch(err => console.error(err));
   };
 
-  const handleCreateCommunity = async () => {
-    if (!name || !fileSelected) return;
+  const handleCreateCommunity = async (data) => {
+    if (!Object.keys(errors).length) {
     setLoading(true);
 
     const formData = new FormData();
 
-    formData.append('name', name);
+    formData.append('name', data.name);
     formData.append('image', fileSelected);
-    if (introduce) {
-      formData.append('introduce', introduce);
-    }
-
+    formData.append('introduce', data.introduce);
+    
     http
       .post('/community', formData)
       .then(res => {
+        ToastNotify({
+          title: 'Tạo cộng đồng thành công',
+          status: 'success',
+        });
         addCommunity(res.data);
         setIsShowModal(false);
         setLoading(false);
       })
-      .catch(error => {
-        console.log(error);
-        setIsShowModal(false);
+      .catch(err => {
+          let errMessage = err.response?.data;
+          if (errMessage) {
+            ToastNotify({
+              title: errMessage.msg.toString(),
+              status: 'warning',
+            });
+          }
         setLoading(false);
       });
+    }
   };
 
   return (
@@ -71,44 +80,105 @@ const Community = () => {
       {/* <input type="file" onChange={e => setFileSelected(e.target.files[0])} />
       <Button onClick={() => handleUploadImage()}>Upload</Button> */}
       {loading && <LoadingPage />}
+     
       <MyModal
         isOpenModal={isShowModal}
         setCloseModal={setIsShowModal}
         title="Tạo cộng đồng mới"
         isCentered={false}
       >
+      <form onSubmit={handleSubmit(handleCreateCommunity)}>
+      <Box pos="relative" pb="0.5em">
         <Input
+          id="name"
+          {...register('name', { required: true, maxLength: 50, minLength: 9 })}
           mb="1em"
           placeholder="Tên cộng đồng"
-          name={name}
-          onChange={e => setName(e.target.value)}
+          // name={name}
+          // onChange={e => setName(e.target.value)}
         />
-        <Box>
+          {errors.name && (
+            <Text
+              pos="absolute"
+              left="0"
+              bottom="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.name?.type === 'required'
+                ? 'Tên cộng đồng là bắt buộc'
+                : errors.name?.type === 'maxLength'
+                ? 'Tên tối đa 50 ký tự'
+                : errors.name?.type === 'minLength'
+                ? 'Tên tối thiểu 9 ký tự'
+                : ''}
+            </Text>
+          )}
+        </ Box>
+        <Box pos="relative" pb="0.5em">
           <Text>Ảnh dại diện</Text>
           <input
+            id="image"
             type="file"
+            {...register('image', { required: true})}
             onChange={e => setFileSelected(e.target.files[0])}
           />
+          {errors.image && (
+            <Text
+              pos="absolute"
+              marginTop="7"
+              left="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.image?.type === 'required'
+                ? 'Avatar cộng đồng là bắt buộc'
+                : ''}
+            </Text>
+          )}
         </Box>
-
+        <Box pos="relative" pb="0.5em">
         <Textarea
+          id="introduce"
+          {...register('introduce', { required: true, maxLength: 500, minLength: 30 })}
           my="1em"
           placeholder="Giới thiệu về cộng đồng"
-          name={introduce}
-          onChange={e => setIntroduce(e.target.value)}
+          // name={introduce}
+          // onChange={e => setIntroduce(e.target.value)}
         />
-
+         {errors.introduce && (
+            <Text
+              pos="absolute"
+              left="0"
+              bottom="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.introduce?.type === 'required'
+                ? 'Phần giới thiệu là bắt buộc'
+                : errors.introduce?.type === 'maxLength'
+                ? 'Phần giới thiệu tối đa 500 ký tự'
+                : errors.introduce?.type === 'minLength'
+                ? 'Phần giới thiệu tối thiểu 30 ký tự'
+                : ''}
+            </Text>
+          )}
+        </ Box>
         <HStack justify="flex-end">
-          <Button colorScheme="teal" onClick={() => handleCreateCommunity()}>
+          <Button colorScheme="teal" type="submit">
             Tạo mới
           </Button>
         </HStack>
+        </ form>
       </MyModal>
-
+      
       <Button colorScheme="teal" onClick={() => setIsShowModal(true)}>
         Tạo mới
       </Button>
-
+     
       <Divider my="0.5em" size="lg" colorScheme="blue" />
 
       <Table variant="striped">

@@ -9,6 +9,10 @@ const createCommunity = async (req, res) => {
   try {
     const { originalname, mimetype, filename } = req.file;
     const { name, introduce } = req.body;
+
+    const community_name = await Community.findOne({name: name})
+    if(community_name) return res.status(400).json({msg: "Cộng đồng đã tồn tại."})
+
     const newCommunity = new Community({
       name,
       avatar: filename,

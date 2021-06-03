@@ -11,6 +11,7 @@ import http from 'utils/http';
 import { Stack } from 'immutable';
 import ToastNotify from 'components/common/ToastNotify';
 import imagePath from 'utils/imagePath';
+import { useForm } from 'react-hook-form';
 
 const CreatePost = () => {
   const history = useHistory();
@@ -29,23 +30,39 @@ const CreatePost = () => {
     EditorState.createEmpty()
   );
   const [imagesSelected, setImagesSelected] = useState([]);
+  const [editorError, setEditorError] = useState(false)
 
   const onEditorStateChange = editorState => {
     setEditorState(editorState);
+    setEditorError(true);
   };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const handleCreatePost = () => {
-    if (!title || !selectedCommunity || !imagesSelected.length) return;
+    setEditorError(true);
+    if (!Object.keys(errors).length) {
+
+      if (((convertToRaw(editorState?.getCurrentContent())).blocks[0].text) === "" || 
+         ((convertToRaw(editorState?.getCurrentContent())).blocks[0].text.length) < 36 ||
+         ((convertToRaw(editorState?.getCurrentContent())).blocks[0].text.split(' ').length) < 5 ) 
+         return;
+
     const formData = new FormData();
     formData.append('title', title);
+    formData.append('communityId', selectedCommunity);
     formData.append(
       'content',
       JSON.stringify(convertToRaw(editorState?.getCurrentContent()))
     );
-    formData.append('communityId', selectedCommunity);
+
     for (let i = 0; i < imagesSelected.length; i++) {
       formData.append('images', imagesSelected[i]);
     }
+
     http
       .post('/posts', formData)
       .then(res => {
@@ -56,6 +73,7 @@ const CreatePost = () => {
         });
       })
       .catch(err => console.log(err));
+    }
   };
 
   // console.log(JSON.stringify(convertToRaw(editorState?.getCurrentContent())));
@@ -77,16 +95,38 @@ const CreatePost = () => {
         Tạo bài viết
       </Text>
       <Text my="0.5em">Thông tin của bạn được bảo mật tuyệt đối</Text>
-      <Box py="0.5em">
-        <Input
-          bg="white"
-          placeholder="Tiêu đề của bài"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-      </Box>
+      <form onSubmit={handleSubmit(handleCreatePost)}>
+        <Box pos="relative" pb="0.5em">
+          <Input
+            id="title"
+            {...register('title', { required: true, maxLength: 100, minLength: 12})}
+            bg="white"
+            placeholder="Tiêu đề của bài"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+           {errors.title && (
+            <Text
+              pos="absolute"
+              marginTop="40px"
+              marginBottom="10px"
+              left="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.title?.type === 'required'
+                ? 'Tiêu đề bài viết là bắt buộc'
+                : errors.title?.type === 'minLength'
+                ? 'Tiêu đề bài viết ít nhất 12 ký tự '
+                : errors.title?.type === 'maxLength'
+                ? 'Tiêu đề bài viết tối đa 100 ký tự'
+                : ''}
+            </Text>
+          )}
+        </Box>
 
-      <HStack mb="0.5em">
+      <HStack my="0.7em" mb="1em">
         <Image
           boxSize="2.5em"
           objectFit="cover"
@@ -96,6 +136,8 @@ const CreatePost = () => {
         />
         <Box flex="1" pos="relative">
           <Input
+            id="community"
+            {...register('community', { required: true})}
             onChange={e => false}
             value={searchInput}
             onFocus={() =>
@@ -104,6 +146,20 @@ const CreatePost = () => {
             bg="white"
             placeholder="Tìm kiếm cộng đồng"
           />
+           {errors.community &&(
+            <Text
+              pos="absolute"
+              marginTop="37px"
+              left="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.community?.type === 'required' && searchInput === ""
+                ? 'Chọn cộng đồng là bắt buộc'
+                : ''}
+            </Text>
+          )}
           <Box
             d={isShowSelectCommunity ? 'block' : 'none'}
             pos="absolute"
@@ -128,10 +184,10 @@ const CreatePost = () => {
               cursor="pointer"
               _hover={{ bg: 'gray.200' }}
               onClick={() => {
-                setIsShowSelectCommunity(false);
                 setSearchInput(community.community?.name);
                 setImageInput(imagePath(community.community?.avatar));
                 setSelectedCommunity(community.community?._id);
+                setIsShowSelectCommunity(false);
               }}
             >
               <Image
@@ -144,18 +200,16 @@ const CreatePost = () => {
                 <Text fontWeight="600" className="one-line-text">
                   {community.community?.name}
                 </Text>
-                {/* <HStack fontSize="xs" spacing="2">
-                  <Text>{community.totalMember} Thành viên</Text>
-                  <Text as="sup">.</Text>
-                  <Text>{community.totalPost} Bài viết</Text>
-                </HStack> */}
               </Box>
             </HStack>
             ))}
           </Box>
         </Box>
       </HStack>
+      <Box pos="relative" pb="0.5em">
       <Editor
+        // id="content"
+        // {...register('content', { required: true, minLength: 36 })}
         editorState={editorState}
         onEditorStateChange={onEditorStateChange}
         toolbar={{
@@ -170,13 +224,47 @@ const CreatePost = () => {
           },
         }}
       />
-
-      <Box>
+       {editorError &&(
+            <Text
+              pos="absolute"
+              marginTop="1px"
+              left="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {((convertToRaw(editorState?.getCurrentContent())).blocks[0].text) === ""
+                ? 'Nội dung bài viết là bắt buộc'
+                : ((convertToRaw(editorState?.getCurrentContent())).blocks[0].text.length) < 36
+                ? 'Nội dung bài viết tối thiểu 36 ký tự'
+                : ((convertToRaw(editorState?.getCurrentContent())).blocks[0].text.split(' ').length) < 5
+                ? 'Nội dung bài viết tối thiểu 5 từ'
+                : ''}
+            </Text>
+          )}
+      </Box>
+      <Box pos="relative" pb="0.5em" mt="0.7em">
         <input
+          id="image"
+          {...register('image', { required: true})}
           type="file"
           multiple="multiple"
           onChange={e => setImagesSelected(e.target.files)}
         />
+        {errors.image && (
+            <Text
+              pos="absolute"
+              marginTop="7"
+              left="0"
+              as="i"
+              fontSize="xs"
+              color="red.600"
+            >
+              {errors.image?.type === 'required'
+                ? 'Hình ảnh bài viết là bắt buộc'
+                : ''}
+            </Text>
+          )}
       </Box>
 
       <HStack mt="1em" justify="flex-end">
@@ -189,10 +277,11 @@ const CreatePost = () => {
         >
           Hủy
         </Button>
-        <Button colorScheme="blue" onClick={() => handleCreatePost()}>
+        <Button colorScheme="blue" type="submit">
           Đăng bài
         </Button>
       </HStack>
+      </form>
     </Box>
   );
 };
