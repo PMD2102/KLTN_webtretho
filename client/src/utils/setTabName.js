@@ -1,4 +1,4 @@
 const setTabName = name =>
-  (window.document.title = name ? `${name} - WebTreTho` : "WebTreTho");
+  (window.document.title = name ? `${name} - Webbeyeu` : "Cộng đồng Webbeyeu");
 
 export default setTabName;

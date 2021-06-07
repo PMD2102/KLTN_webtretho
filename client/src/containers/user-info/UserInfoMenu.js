@@ -17,6 +17,8 @@ import MyModal from 'components/common/MyModal';
 import http from 'utils/http';
 import ToastNotify from 'components/common/ToastNotify';
 import imagePath from 'utils/imagePath';
+import { useForm } from 'react-hook-form';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const UserInfoMenu = () => {
   const { user } = useContext(GlobalContext);
@@ -24,9 +26,19 @@ const UserInfoMenu = () => {
     useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [typePass, setTypePass] = useState(false);
+  const [typeNewPass, setTypeNewPass] = useState(false);
+  
 
-  const handleChangePassword = () => {
-    if (!currentPassword || !newPassword) return;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const handleChangePassword = (data) => {
+    if (!Object.keys(errors).length) {
+      if (newPassword === currentPassword) return;
     http
       .post('/users/change-password', { currentPassword, newPassword })
       .then(res => {
@@ -46,6 +58,7 @@ const UserInfoMenu = () => {
           });
         }
       });
+    }
   };
 
   const resetState = () => {
@@ -61,19 +74,111 @@ const UserInfoMenu = () => {
         title="Đổi mật khẩu"
         isCentered={false}
       >
-        <Input
-          value={currentPassword}
-          onChange={e => setCurrentPassword(e.target.value)}
-          type="password"
-          placeholder="Mật khẩu hiện tại"
-        />
-        <Input
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-          my="0.5em"
-          type="password"
-          placeholder="Mật khẩu mới"
-        />
+        <form onSubmit={handleSubmit(handleChangePassword)}>
+          <Box pos="relative" pb="1em">
+            <Input
+              id="password"
+              {...register('password', { 
+                required: true, 
+                maxLength: 20, 
+                minLength: 8, 
+                pattern: /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/ 
+              })}
+              value={currentPassword}
+              onChange={e => setCurrentPassword(e.target.value)}
+              type={ typePass ? "text" : "password" }
+              placeholder="Mật khẩu hiện tại"
+            />
+            {errors.password && (
+              <Text
+                pos="absolute"
+                left="0"
+                bottom="0"
+                as="i"
+                fontSize="11px"
+                color="red.600"
+              >
+                {errors.password?.type === 'required'
+                ? 'Mật khẩu là bắt buộc'
+                : errors.password?.type === 'maxLength'
+                ? 'Mật khẩu tối đa 20 ký tự'
+                : errors.password?.type === 'minLength'
+                ? 'Mật khẩu tối thiểu 8 ký tự'
+                : errors.password?.type === 'pattern'
+                ? "Mật khẩu chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
+                : ''}
+              </Text>
+            )}
+              <small 
+                style={{
+                  position: "absolute",
+                  top: "40%",
+                  right: "5px",
+                  transform:  "translateY(-50%)",
+                  cursor: "pointer",
+                  opacity: "0.5",
+                  zIndex:"1",
+                  fontSize: "20px"
+                }} 
+                  onClick={() => setTypePass(!typePass)}
+                >
+                  {typePass ? <FaEyeSlash />: <FaEye />}
+              </small>
+            </ Box>
+            <Box pos="relative" pb="1em">
+            <Input
+              id="newpassword"
+              {...register('newpassword', { 
+                required: true, 
+                maxLength: 20, 
+                minLength: 8, 
+                pattern: /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/ 
+              })}
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              type={ typeNewPass ? "text" : "password" }
+              placeholder="Mật khẩu mới"
+            />
+            {(errors.newpassword || newPassword) && (
+              <Text
+                pos="absolute"
+                left="0"
+                bottom="0"
+                as="i"
+                fontSize="11px"
+                color="red.600"
+              >
+                {errors.newpassword?.type === 'required'
+                ? 'Mật khẩu là bắt buộc'
+                : errors.newpassword?.type === 'maxLength'
+                ? 'Mật khẩu tối đa 20 ký tự'
+                : errors.newpassword?.type === 'minLength'
+                ? 'Mật khẩu tối thiểu 8 ký tự'
+                : errors.newpassword?.type === 'pattern'
+                ? "Mật khẩu chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
+                : newPassword === currentPassword
+                ? 'Mật khẩu mới không được trùng với mật khẩu cũ'
+                : ''}
+                
+              </Text>
+            )}
+              <small 
+                style={{
+                  position: "absolute",
+                  top: "40%",
+                  right: "5px",
+                  transform:  "translateY(-50%)",
+                  cursor: "pointer",
+                  opacity: "0.5",
+                  zIndex:"1",
+                  fontSize: "20px"
+                }} 
+                  onClick={() => setTypeNewPass(!typeNewPass)}
+                >
+                  {typeNewPass ? <FaEyeSlash />: <FaEye />}
+              </small>
+            </ Box>
+        
         <HStack justify="flex-end" mt="0.5em">
           <Button
             colorScheme="gray"
@@ -81,10 +186,11 @@ const UserInfoMenu = () => {
           >
             Hủy
           </Button>
-          <Button colorScheme="blue" onClick={() => handleChangePassword()}>
+          <Button colorScheme="blue" type="submit">
             Lưu
           </Button>
         </HStack>
+        </ form>
       </MyModal>
 
       <VStack align="center">

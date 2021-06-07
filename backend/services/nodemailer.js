@@ -16,27 +16,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendMail = async (to, subject, data, type) => {
+const  sendMail = async (to, subject, data, type) => {
   let htmlBody;
   switch (type) {
     case EMAIL_TYPE.VERIFY_USER:
       htmlBody = `<b><a href="${FRONTEND_URI}/verify/${data}">Click here to verify</a></b>`;
       break;
     case EMAIL_TYPE.RESET_PASS:
-      htmlBody = `<b>New password: ${data}</b>`;
-    default:
-      htmlBody = data;
+      htmlBody ='<p>Xin chào bạn,</p> <p>Webbeyeu vừa nhận được một yêu cầu reset mật khẩu từ bạn. Mật khẩu mới của bạn là : </p><p>' + data +
+      '</p><hr><p>Cảm ơn bạn đã đăng ký trở thành một thành viên của Webbeyeu. </hr><p>Chúc bạn tham gia cộng đồng vui vẻ.</p><p>Nếu cần hỗ trợ từ Webbeyeu, vui lòng gửi email về webtretho.kltn2021@gmail.com.</p>';
       break;
-    //   return;
+    default:
+      return;
   }
-
   const emailContent = {
-    // from: "Support@manuci.tk",
     to,
     subject,
     html: htmlBody,
   };
-
   try {
     await transporter.sendMail(emailContent);
   } catch (error) {

@@ -1,37 +1,23 @@
+import {
+  Avatar, Box,
+  Button, Flex, HStack, Input, Radio, RadioGroup, Text, Tooltip
+} from '@chakra-ui/react';
+import ToastNotify from 'components/common/ToastNotify';
+import { GlobalContext } from 'context/GlobalContext';
+import jwtDecode from 'jwt-decode';
 import React, {
   forwardRef,
   useContext,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
-import {
-  Box,
-  Button,
-  HStack,
-  Image,
-  Text,
-  Icon,
-  Avatar,
-  Input,
-  VStack,
-  Divider,
-  Flex,
-  Select,
-  RadioGroup,
-  Radio,
-  Tooltip,
-} from '@chakra-ui/react';
-import DatePicker from 'react-datepicker';
-import UserInfoMenu from './UserInfoMenu';
-import UserInfoLayout from './UserInfoLayout';
-import { GlobalContext } from 'context/GlobalContext';
 import 'react-datepicker/dist/react-datepicker.css';
 import http from 'utils/http';
-import uploadFile from 'utils/uploadFile';
 import imagePath from 'utils/imagePath';
-import ToastNotify from 'components/common/ToastNotify';
-import jwtDecode from 'jwt-decode';
+import uploadFile from 'utils/uploadFile';
+import UserInfoLayout from './UserInfoLayout';
+import UserInfoMenu from './UserInfoMenu';
 
 const InputDatePicker = forwardRef(({ placeholder, value, onClick }, ref) => (
   <Input value={value} placeholder={placeholder} onClick={onClick} ref={ref} />
@@ -64,8 +50,7 @@ const Profile = () => {
       .then(res => setUserInfo(res.data))
       .catch(err => console.error(err));
   }, []);
-
-  const handleChangeUserInfo = ({ value, type }) => {
+  const handleChangeUserInfo = ({value, type }) => {
     switch (type) {
       case userInfoType.name:
         setUserInfo({ ...userInfo, name: value });
@@ -88,6 +73,14 @@ const Profile = () => {
   };
 
   const handleUpdateUserInfo = async () => {
+
+    if (userInfo?.name === '' || 
+        (userInfo?.name.split(' ').length < 2) ||
+        (userInfo?.name.length > 50) ||  
+        (userInfo?.phone.length < 10) 
+       ) 
+      return;
+
     http
       .put(`/users/${user._id}`, userInfo)
       .then(res => {
@@ -201,17 +194,34 @@ const Profile = () => {
           </Box>
           <Box py="0.5em">
             <Text fontWeight="600">Họ và tên*</Text>
-            <Box>
+            <Box pos="relative" pb="1em">
               <Input
                 value={userInfo?.name}
-                placeholder="Họ và tên"
                 onChange={e =>
                   handleChangeUserInfo({
                     value: e.target.value,
                     type: userInfoType.name,
-                  })
-                }
+                  })}  
+                placeholder="Họ và tên"
               />
+               {userInfo?.name && (
+                <Text
+                  pos="absolute"
+                  left="0"
+                  bottom="0"
+                  as="i"
+                  fontSize="xs"
+                  color="red.600"
+                >
+                  {userInfo.name === ''
+                    ? 'Họ và tên là bắt buộc'
+                    : userInfo.name.length > 50
+                    ? 'Họ và tên có độ dài dài nhất 50 ký tự'
+                    :  userInfo.name.split(' ').length < 2
+                    ? 'Họ và tên ít nhất có 2 từ'
+                    : ''}
+                </Text>
+              )}
             </Box>
           </Box>
           {/* <Box py="0.5em">
@@ -223,7 +233,7 @@ const Profile = () => {
               customInput={<InputDatePicker />}
             />
           </Box> */}
-          <Box py="0.5em">
+          <Box pb="0.5em">
             <Text fontWeight="600">Giới tính</Text>
             <Box>
               <RadioGroup
@@ -247,6 +257,7 @@ const Profile = () => {
             <Text fontWeight="600">Email*</Text>
             <Box>
               <Input
+                disabled={true}
                 placeholder="Email"
                 value={userInfo?.email}
                 onChange={e =>
@@ -260,17 +271,31 @@ const Profile = () => {
           </Box>
           <Box py="0.5em">
             <Text fontWeight="600">Điện thoại</Text>
-            <Box>
+            <Box pos="relative" pb="1em">
               <Input
-                placeholder="Điện thoại"
                 value={userInfo?.phone}
                 onChange={e =>
                   handleChangeUserInfo({
                     value: e.target.value,
                     type: userInfoType.phone,
-                  })
-                }
+                  })}
+                placeholder="Điện thoại. Ví dụ: 0901234567, 0351234567,..."
+                type="number"
               />
+              {userInfo?.phone && (
+              <Text
+                pos="absolute"
+                left="0"
+                bottom="0"
+                as="i"
+                fontSize="xs"
+                color="red.600"
+              >
+                {userInfo.phone.length < 10
+                  ? 'Số điện thoại có độ ít nhất 10 '
+                  : ''}
+              </Text>
+              )}
             </Box>
           </Box>
           {/* <Box py="0.5em">
@@ -300,6 +325,13 @@ const Profile = () => {
               </Select>
             </Box>
           </Box> */}
+           <Text
+            as="i"
+            fontSize="sm"
+            color="red.600"
+          >
+            * là những trường bắt buộc không được để trống !!!
+          </ Text>
           <Flex>
             <Button
               bg="blue.700"

@@ -196,21 +196,21 @@ const Messages = () => {
           borderColor="gray.400"
           pos="relative"
           justify="center"
+          fontWeight="bold"
         >
           <Text>{user.username}</Text>
-          <Icon
-            w="1.5em"
-            h="1.5em"
-            as={FaEdit}
-            cursor="pointer"
-            pos="absolute"
-            right="1em"
-            top="50%"
-            transform="translateY(-50%)"
-            _hover={{
-              color: 'teal',
-            }}
-          />
+          {user?.tag && (
+            <Text
+              fontWeight="bold"
+              fontSize="sm"
+              color="red.400"
+              bg="gray.200"
+              p="0.5em"
+              borderRadius="md"
+            >
+              {user.tag}
+            </Text>
+          )}
         </HStack>
 
         <Box maxH="calc(100% - 64px)" overflowY="scroll">
@@ -233,6 +233,7 @@ const Messages = () => {
                 <Text fontWeight="600">
                   {getOtherMemberOfRoom(room.members)?.username}
                 </Text>
+               
                 {room.lastMessage && (
                   <HStack spacing="4">
                     <Text fontSize="xs" as="i">
@@ -244,6 +245,18 @@ const Messages = () => {
                   </HStack>
                 )}
               </Box>
+              {getOtherMemberOfRoom(room.members)?.tag && (
+                  <Text
+                    fontWeight="bold"
+                    fontSize="sm"
+                    color="red.400"
+                    bg="gray.200"
+                    p="0.5em"
+                    borderRadius="md"
+                  >
+                    {getOtherMemberOfRoom(room.members)?.tag}
+                </Text>
+                )}
             </HStack>
           ))}
         </Box>
@@ -278,16 +291,20 @@ const Messages = () => {
                     {/* Acitve 2 ago */}
                   </Text>
                 </VStack>
+                {getOtherMemberOfRoom(roomSelected.members)?.tag && (
+                  <Text
+                    fontWeight="bold"
+                    fontSize="sm"
+                    color="red.400"
+                    bg="gray.200"
+                    p="0.5em"
+                    borderRadius="md"
+                  >
+                    {getOtherMemberOfRoom(roomSelected.members)?.tag}
+                </Text>
+                )}
               </HStack>
-              <Icon
-                w="1.5em"
-                h="1.5em"
-                as={FiInfo}
-                cursor="pointer"
-                _hover={{
-                  color: 'teal',
-                }}
-              />
+              
             </HStack>
             {/* messages history */}
             <Box

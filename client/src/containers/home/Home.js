@@ -13,7 +13,7 @@ import {
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import setTabName from 'utils/setTabName';
 import ImageGrid from 'components/common/ImageGrid';
-import { BiLike } from 'react-icons/bi';
+import {AiFillLike, AiOutlineLike } from 'react-icons/ai';
 import {
   FaRegComment,
   FaFlag,
@@ -47,6 +47,7 @@ function Home() {
   const [userSelected, setUserSelected] = useState();
 
   const [commentInput, setCommentInput] = useState('');
+  const [like, SetLike] = useState();
 
   useEffect(() => {
     setTabName('');
@@ -54,6 +55,15 @@ function Home() {
     http
       .get('/posts')
       .then(res => setPosts(res.data))
+      .catch(err => console.error(err));
+
+      const postId = posts.map(post => post.id);
+    http
+      .get(`/posts/${postId}/like-or-unlike`)
+      .then(res => {
+        const { isLike } = res.data;
+        SetLike(isLike);
+      })
       .catch(err => console.error(err));
   }, []);
 
@@ -68,6 +78,7 @@ function Home() {
       .get(`/posts/${postId}/like-or-unlike`)
       .then(res => {
         const { isLike } = res.data;
+        SetLike(isLike);
         if (typeof isLike !== 'undefined') {
           let post;
           const idx = posts.findIndex(e => {
@@ -232,7 +243,7 @@ function Home() {
                       p="0.5em"
                       borderRadius="md"
                     >
-                      Bác sĩ
+                      {post.author?.tag}
                     </Text>
                   )}
                   <Text as="sup">.</Text>
@@ -297,7 +308,7 @@ function Home() {
                         h="2em"
                         cursor="pointer"
                         _hover={{ color: 'blue.700' }}
-                        as={BiLike}
+                        as={like ? AiOutlineLike : AiFillLike}
                       />
                     </Box>
                     <Text>{post.totalLike}</Text>
@@ -348,7 +359,7 @@ function Home() {
               <Box p="0.5em">
                 <FacebookButton
                   url={path.join('http://localhost:3000', location.pathname)}
-                  appId="577516223211359"
+                  appId="310097323900530"
                 >
                   <Icon
                     w="2em"

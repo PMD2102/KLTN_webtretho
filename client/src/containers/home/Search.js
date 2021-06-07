@@ -49,6 +49,7 @@ const Search = () => {
           })
           .then(res => {
             const { posts, comments, communities } = res.data;
+            console.log({posts, comments, communities});
             setPosts(posts);
             setComments(comments);
             setCommunity(communities);

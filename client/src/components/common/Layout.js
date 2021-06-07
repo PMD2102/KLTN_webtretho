@@ -135,7 +135,7 @@ const Layout = ({ children, location }) => {
                     <Image
                       boxSize="100%"
                       objectFit="cover"
-                      src="https://www.webtretho.com/static/img/logo.png"
+                      src='https://i.imgur.com/FqRxPeA.png'
                       alt="logo"
                     />
                   </Link>
@@ -460,21 +460,20 @@ const Layout = ({ children, location }) => {
                     w="100%"
                     objectFit="cover"
                     transform="scale(0.4)"
-                    src="https://www.webtretho.com/static/img/logo.png"
-                    alt="Manuci"
+                    src="https://i.imgur.com/FqRxPeA.png"
+                    alt="logo"
                   />
                 </Box>
                 <VStack align="left" w="100%" fontSize="xs" spacing="2">
                   <Text textAlign="left" fontWeight="600">
-                    CÔNG TY CỔ PHẦN LINE VIỆT NAM
+                    ĐẠI HỌC CÔNG NGHIỆP TP.HCM
                   </Text>
                   <Text textAlign="left">
-                    Phòng 2D8 Toà nhà JVPE, CVPM Quang Trung, Phường Tân Chánh
-                    Hiệp, Quận 12, Tp. HCM.
+                    12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, Thành phố Hồ Chí Minh.
                   </Text>
-                  <Text textAlign="left">Điện thoại: (+84) 028 3911 8430</Text>
-                  <Text textAlign="left">Hotline: 093 305 9191</Text>
-                  <Text textAlign="left">Email: info@webtretho.com</Text>
+                  <Text textAlign="left">Điện thoại: (+84) 0823 678 348</Text>
+                  <Text textAlign="left">Hotline: 0935 027 834</Text>
+                  <Text textAlign="left">Email: webtretho.kltn2021@gmail.com</Text>
                 </VStack>
                 <VStack align="left" w="100%" fontSize="xs" spacing="2">
                   <Text textAlign="left" fontWeight="600">
@@ -482,7 +481,7 @@ const Layout = ({ children, location }) => {
                   </Text>
                   <Text textAlign="left">Thịnh hành</Text>
                   <Text textAlign="left">Cộng đồng</Text>
-                  <Text textAlign="left">Ngôi nhà Webtretho</Text>
+                  <Text textAlign="left">Ngôi nhà Webbeyeu</Text>
                 </VStack>
                 <VStack align="left" w="100%" fontSize="xs" spacing="2">
                   <Text textAlign="left" fontWeight="600">
@@ -504,13 +503,6 @@ const Layout = ({ children, location }) => {
                   <Text textAlign="left">Qui định diễn đàn</Text>
                 </VStack>
               </Grid>
-            </Box>
-
-            <Box py="1em">
-              <Text fontSize="xs">
-                GPTLMXH số 385/GP-BTTTT do Bộ Thông Tin Truyền Thông cấp lại lần
-                1 ngày 02/11/2018. Chịu trách nhiệm nội dung: Đặng Thị Nghệ Hà
-              </Text>
             </Box>
           </Box>
         </>

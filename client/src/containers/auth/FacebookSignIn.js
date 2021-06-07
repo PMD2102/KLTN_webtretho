@@ -31,7 +31,7 @@ const FacebookSignIn = () => {
 
   return (
     <FacebookLogin
-      appId="577516223211359"
+      appId="310097323900530"
       autoLoad={false}
       fields="name,email,picture"
       // onClick={componentClicked}

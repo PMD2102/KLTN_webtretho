@@ -27,7 +27,7 @@ router
   .post(isAuth, isAdmin, userController.lockOrUnlockUser);
 
 router
-  .route("/:id/reset-password")
-  .get(isAuth, isAdmin, userController.resetPassword);
+  .route("/reset-password")
+  .post(userController.resetPassword);
 
 module.exports = router;

@@ -8,7 +8,7 @@ import {
   Input,
   Text,
 } from '@chakra-ui/react';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaFacebookF } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import setTabName from 'utils/setTabName';
@@ -18,9 +18,12 @@ import jwtDecode from 'jwt-decode';
 import ToastNotify from 'components/common/ToastNotify';
 import { GlobalContext } from 'context/GlobalContext';
 import FacebookSignIn from './FacebookSignIn';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const SignUp = () => {
   const { setCurrentUser } = useContext(GlobalContext);
+  const [typePass, setTypePass] = useState(false);
+  const [name, setName] = useState('');
 
   const {
     register,
@@ -30,6 +33,7 @@ const SignUp = () => {
 
   const handleSignUp = data => {
     if (!Object.keys(errors).length) {
+      if (name.split(' ').length < 2) return;
       http
         .post('/users/sign-up', data)
         .then(res => {
@@ -69,10 +73,12 @@ const SignUp = () => {
           <Input
             id="name"
             {...register('name', { required: true, maxLength: 50 })}
+            value={name}
+            onChange={e => setName(e.target.value)}
             my="0.5em"
             placeholder="Họ tên"
           />
-          {errors.name && (
+          {(errors.name || name) && (
             <Text
               pos="absolute"
               left="0"
@@ -82,9 +88,11 @@ const SignUp = () => {
               color="red.600"
             >
               {errors.name?.type === 'required'
-                ? 'Tên là bắt buộc'
+                ? 'Họ và tên là bắt buộc'
                 : errors.name?.type === 'maxLength'
-                ? 'Tên nhỏ hơn 50 ký tự'
+                ? 'Họ và tên có độ dài dài nhất 50 ký tự'
+                : name.split(' ').length < 2
+                ? 'Họ và tên ít nhất có 2 từ'
                 : ''}
             </Text>
           )}
@@ -92,7 +100,7 @@ const SignUp = () => {
         <Box pos="relative" pb="0.5em">
           <Input
             id="username"
-            {...register('username', { required: true, maxLength: 18 })}
+            {...register('username', { required: true, maxLength: 30, minLength: 8 })}
             my="0.5em"
             placeholder="Tên đăng nhâp"
           />
@@ -107,8 +115,10 @@ const SignUp = () => {
             >
               {errors.username?.type === 'required'
                 ? 'Tên đăng nhập  là bắt buộc'
+                : errors.username?.type === 'minLength'
+                ? 'Tên đăng nhập có độ dài ít nhất 8 ký tự'
                 : errors.username?.type === 'maxLength'
-                ? 'Tên đăng nhập nhỏ hơn 20 ký tự'
+                ? 'Tên đăng nhập có độ dài dài nhất 30 ký tự'
                 : ''}
             </Text>
           )}
@@ -116,9 +126,14 @@ const SignUp = () => {
         <Box pos="relative" pb="0.5em">
           <Input
             id="password"
-            {...register('password', { required: true, maxLength: 20 })}
+            {...register('password', { 
+              required: true, 
+              maxLength: 20, 
+              minLength: 8, 
+              pattern: /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/ 
+            })}
             my="0.5em"
-            type="password"
+            type={ typePass ? "text" : "password" }
             placeholder="Mật khẩu"
           />
           {errors.password && (
@@ -133,10 +148,29 @@ const SignUp = () => {
               {errors.password?.type === 'required'
                 ? 'Mật khẩu là bắt buộc'
                 : errors.password?.type === 'maxLength'
-                ? 'Mật khẩu  nhỏ hơn 20 ký tự'
+                ? 'Mật khẩu tối đa 20 ký tự'
+                : errors.password?.type === 'minLength'
+                ? 'Mật khẩu tối thiểu 8 ký tự'
+                : errors.password?.type === 'pattern'
+                ? "Mật khẩu chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
                 : ''}
             </Text>
           )}
+          <small 
+            style={{
+              position: "absolute",
+              top: "40%",
+              right: "5px",
+              transform:  "translateY(-50%)",
+              cursor: "pointer",
+              opacity: "0.5",
+              zIndex:"1",
+              fontSize:"20px"
+            }} 
+              onClick={() => setTypePass(!typePass)}
+            >
+              {typePass ? <FaEyeSlash />: <FaEye />}
+          </small>
         </Box>
         <Box pos="relative" pb="0.5em">
           <Input
@@ -182,6 +216,7 @@ const SignUp = () => {
           Đăng ký
         </Button>
       </form>
+
 
       {/* <Text>Ngày sinh</Text>
       <HStack>

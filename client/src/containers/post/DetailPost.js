@@ -50,6 +50,7 @@ const DetailPost = () => {
       .get(`/posts/${postId}/like-or-unlike`)
       .then(res => {
         const { isLike } = res.data;
+        console.log(isLike);
         if (typeof isLike !== 'undefined') {
           let post;
           const idx = posts.findIndex(e => {
@@ -260,7 +261,7 @@ const DetailPost = () => {
               <Box p="0.5em">
                 <FacebookButton
                   url={path.join('http://localhost:3000', location.pathname)}
-                  appId="577516223211359"
+                  appId="310097323900530"
                 >
                   <Icon
                     w="2em"

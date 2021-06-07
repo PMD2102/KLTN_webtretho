@@ -44,7 +44,7 @@ const getRooms = async (req, res) => {
       // ],
     })
       .sort({ lastMessage: "1" })
-      .populate("members", ["_id", "username", "avatar"])
+      .populate("members", ["_id", "username", "avatar", "tag"])
       .populate("lastMessage", ["content", "createdAt"]);
     res.json(rooms);
   } catch (error) {
@@ -62,7 +62,7 @@ const getPrivateRoom = async (req, res) => {
       type: ROOM_TYPE.PRIVATE,
     };
     const room = await Room.findOne(query)
-      .populate("members", ["_id", "username", "avatar"])
+      .populate("members", ["_id", "username", "avatar", "tag"])
       .populate("lastMessage", ["content", "createdAt"]);
     if (room) return res.json(room);
     const newRoom = new Room({
@@ -74,6 +74,7 @@ const getPrivateRoom = async (req, res) => {
       "_id",
       "username",
       "avatar",
+      "tag",
     ]);
     res.json(_newRoom);
   } catch (error) {

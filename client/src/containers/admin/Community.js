@@ -92,10 +92,10 @@ const Community = () => {
         <Input
           id="name"
           {...register('name', { required: true, maxLength: 50, minLength: 9 })}
-          mb="1em"
-          placeholder="Tên cộng đồng"
           // name={name}
           // onChange={e => setName(e.target.value)}
+          mb="1em"
+          placeholder="Tên cộng đồng"
         />
           {errors.name && (
             <Text

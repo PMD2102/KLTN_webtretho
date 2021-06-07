@@ -226,7 +226,7 @@ const changePassword = async (req, res) => {
     if (!user) return res.status(401).send("Unauthorized");
 
     const isMatch = await argon2.verify(user.password, currentPassword);
-    if (!isMatch) return res.status(400).send("password is wrong");
+    if (!isMatch) return res.status(400).send("Mật khẩu hiện tại không chính xác !");
 
     const hashPassword = await argon2.hash(newPassword);
     const _user = await User.findByIdAndUpdate(
@@ -284,16 +284,21 @@ function randomPassword(length) {
 
 const resetPassword = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { _id: userId } = req.user;
-    if (id === userId) return res.status(401).send("Unauthorized");
-    const user = await User.findById(id);
-    if (!user) return res.status(401).send("User is not exists");
-    const password = randomPassword(6);
+    const { email } = req.body;
+    const user = await User.findOne({
+      email: email,
+    });
+
+    if (!user) {
+      return res.status(400).send("Email chưa được đăng ký");
+    }
+    console.log(user);
+    const id  = user._id;
+    const password = randomPassword(8);
     const hashPassword = await argon2.hash(password);
     await sendMail(
       user.email,
-      "Reset password",
+      "Quên mật khẩu cộng đồng Webtretho",
       password,
       EMAIL_TYPE.RESET_PASS
     );

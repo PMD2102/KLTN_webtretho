@@ -8,16 +8,17 @@ import {
 import ToastNotify from 'components/common/ToastNotify';
 import { GlobalContext } from 'context/GlobalContext';
 import jwtDecode from 'jwt-decode';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import http from 'utils/http';
 import setTabName from 'utils/setTabName';
 import FacebookSignIn from './FacebookSignIn';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const SignIn = () => {
   const { setCurrentUser } = useContext(GlobalContext);
-
+  const [typePass, setTypePass] = useState(false);
   const {
     register,
     handleSubmit,
@@ -62,7 +63,7 @@ const SignIn = () => {
         <Box pos="relative" pb="0.5em">
           <Input
             id="username"
-            {...register('username', { required: true, maxLength: 18 })}
+            {...register('username', { required: true})}
             my="0.5em"
             placeholder="Tên đăng nhâp"
           />
@@ -77,8 +78,10 @@ const SignIn = () => {
             >
               {errors.username?.type === 'required'
                 ? 'Tên đăng nhập  là bắt buộc'
-                : errors.username?.type === 'maxLength'
-                ? 'Tên đăng nhập nhỏ hơn 20 ký tự'
+                // : errors.username?.type === 'minLength'
+                // ? 'Tên đăng nhập có độ dài ít nhất 8 ký tự'
+                // : errors.username?.type === 'maxLength'
+                // ? 'Tên đăng nhập có độ dài dài nhất 30 ký tự'
                 : ''}
             </Text>
           )}
@@ -86,9 +89,14 @@ const SignIn = () => {
         <Box pos="relative" pb="0.5em">
           <Input
             id="password"
-            {...register('password', { required: true, maxLength: 20 })}
+            {...register('password', { 
+              required: true, 
+              // maxLength: 20, 
+              // minLength: 8, 
+              // pattern: /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/ 
+            })}
             my="0.5em"
-            type="password"
+            type={ typePass ? "text" : "password" }
             placeholder="Mật khẩu"
           />
           {errors.password && (
@@ -102,11 +110,30 @@ const SignIn = () => {
             >
               {errors.password?.type === 'required'
                 ? 'Mật khẩu là bắt buộc'
-                : errors.password?.type === 'maxLength'
-                ? 'Mật khẩu  nhỏ hơn 20 ký tự'
+                // : errors.password?.type === 'maxLength'
+                // ? 'Mật khẩu tối đa 20 ký tự'
+                // : errors.password?.type === 'minLength'
+                // ? 'Mật khẩu tối thiểu 8 ký tự'
+                // : errors.password?.type === 'pattern'
+                // ? "Mật khẩu chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt"
                 : ''}
             </Text>
           )}
+           <small 
+            style={{
+              position: "absolute",
+              top: "40%",
+              right: "5px",
+              transform:  "translateY(-50%)",
+              cursor: "pointer",
+              opacity: "0.5",
+              zIndex: "1",
+              fontSize: "20px"
+            }} 
+              onClick={() => setTypePass(!typePass)}
+            >
+              {typePass ? <FaEyeSlash />: <FaEye />}
+           </small>
         </Box>
 
         <Button
@@ -119,6 +146,13 @@ const SignIn = () => {
           Đăng nhập
         </Button>
       </form>
+
+      <Link to='./lay-lai-mat-khau'>
+        <Text fontSize="sm" color="blue.800" fontWeight="500">
+          Quên mật khẩu?
+        </Text>
+      </ Link>
+
       <Divider my="0.5em" />
       <Text fontSize="md">Hoặc đăng nhập qua</Text>
       <FacebookSignIn />

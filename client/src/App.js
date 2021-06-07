@@ -6,6 +6,7 @@ import PrivateRoute from 'components/routing/PrivateRoute';
 import PublicRoute from 'components/routing/PublicRoute';
 import SignIn from 'containers/auth/SignIn';
 import SignUp from 'containers/auth/SignUp';
+import ResetPassword from 'containers/auth/ResetPassword';
 import Community from 'containers/community/Community';
 import Home from 'containers/home/Home';
 import CreatePost from 'containers/post/CreatePost';
@@ -64,6 +65,7 @@ function App() {
             <Switch>
               <Route exact path="/" component={Home} />
               <PublicRoute exact path="/dang-nhap" component={SignIn} />
+              <PublicRoute exact path="/lay-lai-mat-khau" component={ResetPassword} />
               <PublicRoute exact path="/dang-ky" component={SignUp} />
               <Route exact path="/cong-dong" component={Community} />
               <Route

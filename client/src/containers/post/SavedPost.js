@@ -19,6 +19,7 @@ import convertToHTML from 'utils/convertToHTML';
 import { BiLike } from 'react-icons/bi';
 import { FaFlag, FaRegComment } from 'react-icons/fa';
 import { FiShare } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const SavedPost = () => {
   const [loading, setLoading] = useState(true);
@@ -84,12 +85,35 @@ const SavedPost = () => {
                           <Text as="i" fontWeight="bold">
                             {post.community?.name}
                           </Text>
-                          <Text as="i" fontSize="xs">
-                            {timeToDate(post.createdAt)}
+                          <HStack fontSize="md">
+                          <Text>Đăng bởi</Text>
+                          <Text
+                            fontWeight="600"
+                            color="blue.700"
+                          >
+                            {post.author?.username}
                           </Text>
+                            {post.author?.tag && (
+                            <Text
+                              fontWeight="bold"
+                              fontSize="lg"
+                              color="red.400"
+                              bg="gray.200"
+                              p="0.5em"
+                              borderRadius="md"
+                            >
+                              Bác sĩ
+                            </Text>
+                          )}
+                          <Text as="sup">.</Text>
+                          <Text>{timeToDate(post.createdAt)}</Text>
+                        </HStack>
                         </VStack>
                       </HStack>
-
+                      <Link to={`/bai-viet/${post._id}`}>
+                      <Text fontWeight="600" fontSize="xl" color="black" mt="0.5em">
+                        {post.title}
+                      </Text>
                       <Text
                         fontSize="md"
                         className="three-line-text"
@@ -100,7 +124,8 @@ const SavedPost = () => {
                       <ImageGrid
                         images={post.images?.map(img => imagePath(img))}
                       />
-                      <HStack
+                      </ Link>
+                      {/* <HStack
                         borderTop="1px solid"
                         borderBottom="1px solid"
                         borderColor="gray.200"
@@ -156,7 +181,7 @@ const SavedPost = () => {
                             // onClick={() => handleSavePost(post._id)}
                           />
                         </Box>
-                      </HStack>
+                      </HStack> */}
                     </VStack>
                   ))
                 )}

@@ -51,18 +51,6 @@ const Users = () => {
       .catch(err => console.error(err));
   };
 
-  const handleResetPassword = userId => {
-    http
-      .get(`/users/${userId}/reset-password`)
-      .then(res => {
-        ToastNotify({
-          title: 'Email chứa mật khẩu đã được gửi tới email của người dùng',
-          status: 'success',
-        });
-      })
-      .catch(err => console.error(err));
-  };
-
   const handleDeleteUser = userId => {
     http
       .delete(`/users/${userId}`)
@@ -156,7 +144,16 @@ const Users = () => {
                     <Text fontWeight="bold">Giới tính</Text>
                   </Td>
                   <Td>
-                    <Text>{userSelected?.gender}</Text>
+                    {userSelected.gender ?  
+                      <Text>
+                        {userSelected.gender === 1
+                        ? 'Nam'
+                        : userSelected.gender === 2
+                        ? 'Nữ'
+                        : 'Khác'}
+                      </Text>
+                      : 'Khác'
+                    }
                   </Td>
                 </Tr>
               </Tbody>
@@ -234,7 +231,7 @@ const Users = () => {
                     p="0.5em"
                     borderRadius="md"
                   >
-                    Bác sĩ
+                    {user.tag}
                   </Text>
                 )}
               </Td>
@@ -263,13 +260,6 @@ const Users = () => {
                     }
                   >
                     {user.isActivate ? 'Khóa' : 'Mở khóa'}
-                  </Button>
-                  <Button
-                    bg="teal.400"
-                    _hover={{ bg: 'teal.200' }}
-                    onClick={() => handleResetPassword(user._id)}
-                  >
-                    Reset mật khẩu
                   </Button>
                   <Button
                     bg="red.400"

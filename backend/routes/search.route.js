@@ -108,7 +108,7 @@ router.route("/").get(async (req, res) => {
       $match: {
         $or: [
           { name: { $regex: new RegExp(search, "gi") } },
-          { introduce: { $regex: new RegExp(search, "gi") } },
+          // { introduce: { $regex: new RegExp(search, "gi") } },
         ],
       },
     },
